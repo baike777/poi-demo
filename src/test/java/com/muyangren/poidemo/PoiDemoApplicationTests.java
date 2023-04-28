@@ -25,32 +25,35 @@ import java.util.List;
 @SpringBootTest
 class PoiDemoApplicationTests {
     /**
-     * 按照我写的顺序看就行
+     * 按照我写的顺序先看一遍
      * @throws IOException
      */
     @Test
     void contextLoads() throws IOException {
+        // 一、初始化数据
         // 1）初始化模板数据-实际是去数据库查询-自行整合
         Templates templates = initTemplates();
-        // 1）初始化家庭成员信息-实际是去数据库查询-自行整合
+        // 2）初始化家庭成员信息-实际是去数据库查询-自行整合
         List<FamilyMember> familyMemberList = initFamilyMember();
-        // 1）初始化工作情况-实际是去数据库查询-自行整合
+        // 3）初始化工作情况-实际是去数据库查询-自行整合
         List<Going> goingList = initGoing();
 
-        // 2）处理动态数据->转为RowRenderData类型即List<Going>->List<RowRenderData>
+        // 二、初始化动态数据-并整合一个完整的对象
+        // 1）处理动态数据->转为RowRenderData类型即List<Going>->List<RowRenderData>
         TemplateRowRenderData templateRowRenderData = new TemplateRowRenderData(familyMemberList,goingList);
-
-        // 3）完整数据
+        // 2）完整数据
         TemplateData templateData = new TemplateData(templates,templateRowRenderData);
 
-        // 插件绑定-【TemplateTableRenderPolicy】插件中data能获取到【TemplateRowRenderData】动态数据的关键
-        // 注意：模板中也是根据该字段进行渲染：templateRowRenderData
+        // 三、绑定插件
+        // 1）插件绑定-【TemplateTableRenderPolicy】插件中data能获取到【TemplateRowRenderData】动态数据的关键
+        // 注意：模板中也是根据该字段进行渲染：templateRowRenderData 如图resources/pictures/images1.jpg   特别注意不要用到了中文画框花，鼠鼠我郁闷了一早上也想不明道插件为什么不生效
         Configure config = Configure.builder().bind("templateRowRenderData", new TemplateTableRenderPolicy()).build();
 
+        //  四、导出
         ClassPathResource classPathResource = new ClassPathResource("templates" + File.separator + "鼠鼠教你如何实现动态导出.docx");
         XWPFTemplate template = XWPFTemplate.compile(classPathResource.getInputStream(),config).render(
                 templateData);
-        template.writeAndClose(new FileOutputStream("C:\\Users\\guangsheng\\Desktop\\output9.docx"));
+        template.writeAndClose(new FileOutputStream("C:\\Users\\guangsheng\\Desktop\\output.docx"));
     }
 
 
@@ -59,7 +62,7 @@ class PoiDemoApplicationTests {
         Templates templates = new Templates();
         templates.setName("吃了没");
         templates.setAliases("吃我一拳");
-        templates.setDeptName("孙笑川吧");
+        templates.setDeptName("勿入鼠穴");
         templates.setSexName("gay");
         templates.setPeoples("汉族");
         templates.setBirth("2000");

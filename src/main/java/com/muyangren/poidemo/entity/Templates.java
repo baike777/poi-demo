@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * @author: muyangren
  * @Date: 2023/1/16
- * @Description: com.muyangren.entity
+ * @Description: 基础数据
  * @Version: 1.0
  */
 @Data
