@@ -1,11 +1,14 @@
 package com.muyangren.poidemo.utils.word.template;
 
 import com.deepoove.poi.data.*;
+import com.deepoove.poi.data.style.*;
 import com.deepoove.poi.policy.TableRenderPolicy;
 import com.muyangren.poidemo.entity.FamilyMember;
 import com.muyangren.poidemo.entity.Going;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
 import java.util.ArrayList;
@@ -31,9 +34,36 @@ public class TemplateRowRenderData {
      */
     private List<RowRenderData> goingRowRenderDataList;
 
+    private  RowStyle rowStyle;
+
     public TemplateRowRenderData(List<FamilyMember> familyMemberList, List<Going> goingList) {
+        // 初始化样式
+        initStyle();
         // 初始化动态数据
         initData(familyMemberList, goingList);
+    }
+
+    private void initStyle() {
+        // 此处定义样式的优先级高:想看样式获取顺序可以看【TemplateTableRenderPolicy】中的【TableRenderPolicy.Helper.renderRow(xwpfTable.getRow(familyMemberRow), familyRowRenderDataList.get(i))】 谢谢你作者 很规范 nmd
+
+        // 字体样式
+        Style style = new Style("宋体", 10);
+
+        // 段落样式
+        ParagraphStyle paragraphStyle = new ParagraphStyle();
+        paragraphStyle.setDefaultTextStyle(style);
+        // ps:这里才是字体居中对齐
+        paragraphStyle.setAlign(ParagraphAlignment.CENTER);
+
+        // 表格样式
+        CellStyle cellStyle = new CellStyle();
+        // ps:表格也需要居中，否则字体不在正中间，会偏上
+        cellStyle.setVertAlign(XWPFTableCell.XWPFVertAlign.CENTER);
+        cellStyle.setDefaultParagraphStyle(paragraphStyle);
+
+        // 行样式
+        this.rowStyle = new RowStyle();
+        rowStyle.setDefaultCellStyle(cellStyle);
     }
 
     private void initData(List<FamilyMember> familyMemberList, List<Going> goingList) {
@@ -52,6 +82,8 @@ public class TemplateRowRenderData {
                 cellDataList.add(new CellRenderData().addParagraph(new ParagraphRenderData().addText(familyMember.getName())));
                 cellDataList.add(new CellRenderData().addParagraph(new ParagraphRenderData().addText(familyMember.getPosition())));
                 RowRenderData rowRenderData = new RowRenderData();
+                // 样式
+                rowRenderData.setRowStyle(rowStyle);
                 rowRenderData.setCells(cellDataList);
                 newFamilyRowRenderDataList.add(rowRenderData);
             }
@@ -72,6 +104,8 @@ public class TemplateRowRenderData {
                 cellDataList.add(new CellRenderData().addParagraph(new ParagraphRenderData().addText(going.getAddress())));
                 cellDataList.add(new CellRenderData().addParagraph(new ParagraphRenderData().addText(going.getPhone())));
                 RowRenderData rowRenderData = new RowRenderData();
+                // 样式
+                rowRenderData.setRowStyle(rowStyle);
                 rowRenderData.setCells(cellDataList);
                 newGoingRowRenderDataList.add(rowRenderData);
             }

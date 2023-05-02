@@ -2,7 +2,6 @@ package com.muyangren.poidemo;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
-import com.deepoove.poi.config.ConfigureBuilder;
 import com.muyangren.poidemo.entity.FamilyMember;
 import com.muyangren.poidemo.entity.Going;
 import com.muyangren.poidemo.entity.Templates;
@@ -53,6 +52,9 @@ class PoiDemoApplicationTests {
         ClassPathResource classPathResource = new ClassPathResource("templates" + File.separator + "鼠鼠教你如何实现动态导出.docx");
         XWPFTemplate template = XWPFTemplate.compile(classPathResource.getInputStream(),config).render(
                 templateData);
+
+        // 通过浏览器下载自行整合下即可
+        // controller获取HttpServerResponse
         template.writeAndClose(new FileOutputStream("C:\\Users\\guangsheng\\Desktop\\output.docx"));
     }
 
