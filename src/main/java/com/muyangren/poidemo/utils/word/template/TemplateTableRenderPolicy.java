@@ -41,7 +41,7 @@ public class TemplateTableRenderPolicy extends DynamicTableRenderPolicy {
             xwpfTable.removeRow(familyMemberRow);
             // 3)获取该表家庭成员表头高度 【familyMemberRow-1】即家庭成员表头的下标  作用：统一高度
             XWPFTableRow xwpfTableRow = xwpfTable.getRow(familyMemberRow-1);
-            // 4)循环插入行 ps：这里是一直在第9行插入表格。
+            // 4)循环插入行 (倒序插入)ps：这里是一直在第9行插入表格。
             for (int i = familyRowRenderDataList.size() - 1; i > -1; i--) {
                 // 4.1)插入表格
                 XWPFTableRow insertNewTableRow = xwpfTable.insertNewTableRow(familyMemberRow);
@@ -67,48 +67,49 @@ public class TemplateTableRenderPolicy extends DynamicTableRenderPolicy {
                 // 6) 渲染数据(表格对齐后在进行渲染数据)
                 TableRenderPolicy.Helper.renderRow(xwpfTable.getRow(familyMemberRow), familyRowRenderDataList.get(i));
             }
-            // 7)跨行合并行
+            // 7)跨行合并行 参数说明： 1-操作表格方法 2-需要合并行 3-开始合并列 4-结束合并列
             // 7.1) 合并前：resource/pictures/images8.jpg
             // 7.2) 合并后：resource/pictures/images9.jpg
             int fromRow = familyMemberRow - 1;
+            // 7.3)合并下标为1的行 合并列为fromRow->familyRowRenderDataList.size() + fromRow
+            // 7.4)合并下标为0的行 合并列为0->familyRowRenderDataList.size() + fromRow
             TableTools.mergeCellsVertically(xwpfTable, 1, fromRow, familyRowRenderDataList.size() + fromRow);
             TableTools.mergeCellsVertically(xwpfTable, 0, 0, familyRowRenderDataList.size() + fromRow);
         }
 //---------------------------------------以上为家庭成员的数据渲染------------------------------------------------------------
 
-        // 二、处理家庭成员数据
+        // 二、处理工作情况数据-关键处此篇不给出解析，大家根据【家庭成员】 自行填写
         List<RowRenderData> goingRowRenderDataList = templateRowRenderData.getGoingRowRenderDataList();
+        // 1)判空
         if (CollectionUtils.isNotEmpty(goingRowRenderDataList)) {
-            // 2)不为空，则有多少条就添加多少行
-            // 工作情况所在行数
+            // 2)工作情况所在行数 ps:其实我们从0开始数的话、可以省很多事
             int goingMemberRow = 11;
-            if (CollectionUtils.isEmpty(familyRowRenderDataList)) {
-            } else {
+            if (!CollectionUtils.isEmpty(familyRowRenderDataList)) {
                 goingMemberRow = 11 + familyRowRenderDataList.size() - 1;
             }
-
-            // 删除时从下标开始的、所以会删除到空白行
+            // 3)
             xwpfTable.removeRow(goingMemberRow);
-            // 获取该表家庭成员表头高度
+            // 4)
             XWPFTableRow xwpfTableRow = xwpfTable.getRow(goingMemberRow-1);
-            // 5)循环插入行
+            // 5)循环插入行(倒序插入)
             for (int i = goingRowRenderDataList.size() - 1; i > -1; i--) {
                 XWPFTableRow insertNewTableRow = xwpfTable.insertNewTableRow(goingMemberRow);
                 insertNewTableRow.setHeight(xwpfTableRow.getHeight());
-                // 表格突出就减、缩进去就加：先满足这里在去弄合并的
+                // 6)
                 for (int j = 0; j < 11; j++) {
                     insertNewTableRow.createCell();
                 }
-                // (这里就要凭感觉去合并 注意：眼见不一定所得，因为两个表格合并的未必就比一个表格大) 但是
-                // 合并单元格 fromCol至toCol 且 fromCol(起始) < toCol(结束), 指的是上一个合并完后的表格数 (基本信息占1格,家庭成员占1个,关系、姓名、职位各占3 刚好11格)
-                TableTools.mergeCellsHorizonal(xwpfTable, goingMemberRow, 1, 2); // fromCol开始合并到toCol表格 【关系】下标为2
-                TableTools.mergeCellsHorizonal(xwpfTable, goingMemberRow, 2, 7); // fromCol开始合并到toCol表格  【姓名】下标为3
-                TableTools.mergeCellsHorizonal(xwpfTable, goingMemberRow, 3, 4); // fromCol开始合并到toCol表格  注：是第一个合并完后的表格数  【职位】下标为4
-                // 渲染数据(表格对齐后在进行渲染数据)
+                // 7)
+                // 7.1)合并表格
+                TableTools.mergeCellsHorizonal(xwpfTable, goingMemberRow, 1, 2);
+                // 7.2)合并表格
+                TableTools.mergeCellsHorizonal(xwpfTable, goingMemberRow, 2, 7);
+                // 7.3)合并表格
+                TableTools.mergeCellsHorizonal(xwpfTable, goingMemberRow, 3, 4);
+                // 8)渲染数据
                 TableRenderPolicy.Helper.renderRow(xwpfTable.getRow(goingMemberRow), goingRowRenderDataList.get(i));
             }
-             //跨行合并行 例如-【基本情况】-【家庭成员】
-             //参数分别为：xwpfTable,需要合并的表格下表,也就【家庭情况】下标为1, 开始合并行，结束行(开始合并+动态数据量)
+            // 9)合并行
             TableTools.mergeCellsVertically(xwpfTable,0,goingMemberRow-1,goingMemberRow +goingRowRenderDataList.size()-1);
         }
     }
