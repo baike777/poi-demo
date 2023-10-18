@@ -30,7 +30,6 @@ import static org.junit.Assert.assertNotNull;
 class PoiDemoApplicationTests {
     /**
      * 按照我写的顺序先看一遍
-     * @throws IOException
      */
     @Test
     void contextLoads()  {
